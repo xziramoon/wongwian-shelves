@@ -4,7 +4,7 @@
  */
 
 .screen {
-  padding: 16px 16px 32px;
+  padding: calc(var(--app-bar-total-h) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
   max-width: 720px;
   margin: 0 auto;
   display: flex;
@@ -19,11 +19,15 @@
 }
 
 .warn-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   background: var(--o-soft);
-  color: var(--o);
-  border: 1px solid var(--o);
-  border-radius: 12px;
-  padding: 10px 14px;
+  color: #8a5c07;
+  border: 1px solid rgba(217, 134, 10, 0.3);
+  border-radius: 14px;
+  padding: 12px 14px;
   font-size: 13.5px;
   font-weight: 600;
 }
@@ -35,18 +39,18 @@
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
-  padding-top: 44px; /* เว้นที่ให้ conn-status / settings-gear-btn ที่ลอยอยู่มุมบน */
 }
 .home-header-info {
   font-size: 13.5px;
   color: var(--txt2);
+  font-weight: 500;
 }
 .home-header-time {
   color: var(--txt2);
 }
 
 .check-today-card .p-lbl {
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 .check-today-list {
   display: flex;
@@ -66,13 +70,14 @@
 .shelf-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 .shelf-card {
   background: var(--surface);
   border: 1.5px solid var(--ln2);
-  border-radius: 16px;
-  padding: 14px;
+  box-shadow: var(--shadow-sm);
+  border-radius: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -80,10 +85,15 @@
   text-align: left;
   cursor: pointer;
   font-family: var(--f-ui);
-  min-height: 96px;
+  min-height: 104px;
+  transition: transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.shelf-card:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
 }
 .shelf-card-code {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   color: var(--ink);
 }
@@ -99,12 +109,12 @@
 .shelf-card-badge {
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 999px;
 }
 .badge-warn {
   background: var(--o-soft);
-  color: var(--o);
+  color: #8a5c07;
 }
 .badge-pending {
   background: var(--r-soft);
@@ -113,10 +123,12 @@
 .shelf-card-add {
   align-items: center;
   justify-content: center;
-  color: var(--ac);
+  color: var(--ac-d);
   font-weight: 700;
   font-size: 15px;
-  border-style: dashed;
+  background: var(--ac-tint);
+  border: 1.5px dashed var(--ac);
+  box-shadow: none;
 }
 
 .home-footer-links {
@@ -129,7 +141,7 @@
 .row-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 .row-card {
   display: flex;
@@ -137,16 +149,26 @@
   gap: 12px;
   background: var(--surface);
   border: 1.5px solid var(--ln2);
-  border-radius: 14px;
-  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  padding: 14px;
   cursor: pointer;
   text-align: left;
   font-family: var(--f-ui);
+  transition: transform 0.1s ease;
+}
+.row-card:active {
+  transform: scale(0.98);
 }
 .row-card-no {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 800;
-  min-width: 34px;
+  min-width: 38px;
+  text-align: center;
+  color: var(--ac-d);
+  background: var(--ac-tint);
+  border-radius: 10px;
+  padding: 6px 4px;
 }
 .row-card-info {
   flex: 1;
@@ -172,7 +194,7 @@
   background: none;
   border: none;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ac-d);
   cursor: pointer;
   padding: 8px 0;
@@ -181,16 +203,18 @@
 /* ---- row screen ---- */
 .row-header {
   position: sticky;
-  top: 0;
+  top: var(--app-bar-total-h);
   z-index: 20;
   background: var(--canvas);
   padding: 10px 0 4px;
+  margin: -10px 0 0;
 }
 .row-header-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  color: var(--ink);
 }
 .scan-mode-btns {
   display: grid;
@@ -202,9 +226,11 @@
   border-radius: 12px;
   border: 1.5px solid var(--ln2);
   background: var(--surface);
+  color: var(--ink);
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
 }
 .scan-mode-btn.mode-in.active {
   background: var(--g);
@@ -223,15 +249,11 @@
 }
 
 .row-camera {
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
   background: #000;
   aspect-ratio: 4 / 3;
-}
-.row-camera-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  box-shadow: var(--shadow-sm);
 }
 .input-method-tabs {
   display: flex;
@@ -239,13 +261,15 @@
 }
 .input-method-tab {
   flex: 1;
-  min-height: 40px;
-  border-radius: 10px;
+  min-height: 42px;
+  border-radius: 11px;
   border: 1.5px solid var(--ln2);
   background: var(--surface);
+  color: var(--ink);
   font-weight: 600;
   font-size: 13.5px;
   cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 .input-method-tab.active {
   background: var(--ac-tint);
@@ -262,9 +286,11 @@
 }
 .wedge-status {
   text-align: center;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--txt2);
-  padding: 4px 0;
+  padding: 6px 0;
+  font-weight: 600;
+  cursor: pointer;
 }
 .wedge-status.ready {
   color: var(--g);
@@ -282,14 +308,15 @@
   gap: 10px;
   background: var(--surface);
   border: 1.5px solid var(--ln2);
-  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
   padding: 10px 12px;
 }
 .row-item-thumb {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 9px;
   flex-shrink: 0;
   background: #fff;
   border: 1px solid var(--ln2);
@@ -302,6 +329,7 @@
 .row-item-name {
   font-size: 14px;
   font-weight: 600;
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -320,7 +348,7 @@
 }
 .row-item-flag.flag-warn {
   background: var(--o-soft);
-  color: var(--o);
+  color: #8a5c07;
 }
 .row-item-flag.flag-pending {
   background: var(--r-soft);
@@ -337,19 +365,23 @@
   flex-direction: column;
 }
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  color: var(--txt2);
+  border-radius: 9px;
   font-size: 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.12s ease, color 0.12s ease;
 }
-.icon-btn:hover {
+.icon-btn:hover,
+.icon-btn:active {
   background: var(--surface2);
+  color: var(--ink);
 }
 
 /* ---- ยิงทวน summary ---- */
@@ -367,11 +399,12 @@
   background: var(--surface);
   border: 1.5px solid var(--ln2);
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   margin-bottom: 6px;
 }
 .check-row-name {
   font-size: 13.5px;
+  color: var(--ink);
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -384,6 +417,7 @@
   border-radius: 10px;
   border: 1.5px solid var(--ln2);
   background: var(--surface2);
+  color: var(--ink);
   font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
@@ -403,33 +437,43 @@
 .print-summary {
   background: var(--surface);
   border: 1.5px solid var(--ln2);
-  border-radius: 14px;
-  padding: 14px;
+  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--ink);
+  font-size: 13.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .print-shelf-pick {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 .print-shelf-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--ink);
 }
 .print-row-pick {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   padding-left: 26px;
+  margin-top: 6px;
 }
 .chip-btn {
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   border: 1.5px solid var(--ln2);
   background: var(--surface2);
+  color: var(--ink);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 .chip-btn.active {
   background: var(--ac);

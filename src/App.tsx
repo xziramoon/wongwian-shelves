@@ -41,20 +41,24 @@ function App() {
 
   return (
     <div className="app-shell">
-      <ConnectionStatus />
-      <button
-        type="button"
-        className="settings-gear-btn"
-        onClick={() => setSettingsSheetOpen(true)}
-        aria-label="ตั้งค่าป้ายราคา"
-      >
-        ⚙
-      </button>
+      <header className="app-bar">
+        <ConnectionStatus />
+        <button
+          type="button"
+          className="settings-gear-btn"
+          onClick={() => setSettingsSheetOpen(true)}
+          aria-label="ตั้งค่าป้ายราคา"
+        >
+          ⚙
+        </button>
+      </header>
 
-      {screen.name === 'home' && <HomeScreen />}
-      {screen.name === 'shelf' && <ShelfScreen shelfId={screen.shelfId} />}
-      {screen.name === 'row' && <RowScreen shelfId={screen.shelfId} rowId={screen.rowId} />}
-      {screen.name === 'print' && <PrintScreen />}
+      <main className="app-main">
+        {screen.name === 'home' && <HomeScreen />}
+        {screen.name === 'shelf' && <ShelfScreen shelfId={screen.shelfId} />}
+        {screen.name === 'row' && <RowScreen shelfId={screen.shelfId} rowId={screen.rowId} />}
+        {screen.name === 'print' && <PrintScreen />}
+      </main>
 
       <SettingsSheet />
       <ToastContainer />
