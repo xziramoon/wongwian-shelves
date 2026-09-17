@@ -1,5 +1,8 @@
+import { useRef } from 'react';
 import { useConfigStore } from '../store/configStore';
 import { useUIStore } from '../store/uiStore';
+import { useShelvesStore } from '../store/shelvesStore';
+import { database } from '../lib/database';
 import type { QueueItem } from '../types';
 import TagPreview from './TagPreview';
 import SliderRow from './SliderRow';
@@ -37,6 +40,12 @@ const PLACEHOLDER_ITEM: QueueItem = {
  * always-visible basics up top, ~12 SliderRows tucked under a <details> fold so the
  * common case (pick a preset, maybe change the header text) doesn't need scrolling
  * past a wall of sliders. */
+function fmtDaysAgo(ts: number): string {
+  const days = Math.floor((Date.now() - ts) / 86400000);
+  if (days <= 0) return 'วันนี้';
+  return `${days} วันก่อน`;
+}
+
 export default function SettingsSheet() {
   const open = useUIStore((s) => s.settingsSheetOpen);
   const setOpen = useUIStore((s) => s.setSettingsSheetOpen);
@@ -44,7 +53,52 @@ export default function SettingsSheet() {
   const updateConfig = useConfigStore((s) => s.updateConfig);
   const applyPreset = useConfigStore((s) => s.applyPreset);
 
+  const exportFile = useShelvesStore((s) => s.exportFile);
+  const importFile = useShelvesStore((s) => s.importFile);
+  const markBackedUp = useShelvesStore((s) => s.markBackedUp);
+  const removed = useShelvesStore((s) => s.removed);
+  const showToast = useUIStore((s) => s.showToast);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   if (!open) return null;
+
+  const handleExport = () => {
+    const file = exportFile();
+    const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `SHELVES_${dateStr}.json`,
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    markBackedUp();
+    showToast('สำรองข้อมูลเรียบร้อย', 'success');
+  };
+
+  const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (!confirm('นำเข้าข้อมูลนี้จะเขียนทับข้อมูลชั้นวางทั้งหมดในเครื่องนี้ ยืนยันหรือไม่?')) return;
+        const res = importFile(data);
+        if (res.ok) showToast('นำเข้าข้อมูลเรียบร้อย', 'success');
+        else showToast(res.error || 'ไฟล์ข้อมูลไม่ถูกต้อง', 'error');
+      } catch {
+        showToast('ไฟล์ข้อมูลเสียหาย อ่านไม่ได้', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const removedSorted = [...removed].sort((a, b) => b.removedAt - a.removedAt);
 
   const previewItem = PLACEHOLDER_ITEM;
 
@@ -120,6 +174,36 @@ export default function SettingsSheet() {
           />
           <label htmlFor="invert-baht">ถมดำพื้นหลังคำว่า "บาท"</label>
         </div>
+
+        <div className="panel">
+          <div className="p-lbl">ข้อมูลชั้นวาง</div>
+          <div className="sheet-actions">
+            <button type="button" className="btn btn-secondary" onClick={handleExport}>
+              สำรองข้อมูล
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={handleImportClick}>
+              นำเข้าข้อมูล
+            </button>
+          </div>
+          <input ref={fileInputRef} type="file" accept="application/json" hidden onChange={handleImportFile} />
+        </div>
+
+        <details className="fold">
+          <summary>
+            ประวัติยิงออก ({removedSorted.length})<span className="fold-arrow">▾</span>
+          </summary>
+          <div className="fold-body">
+            {removedSorted.length === 0 && <div className="row-card-meta">ยังไม่มีประวัติ</div>}
+            {removedSorted.slice(0, 200).map((r, i) => (
+              <div className="check-row" key={`${r.barcode}-${r.removedAt}-${i}`}>
+                <span className="check-row-name">
+                  {database.find(r.barcode)?.ProductName || `รหัส: ${r.barcode}`} · เดิมอยู่ {r.loc}
+                </span>
+                <span className="row-item-meta">{fmtDaysAgo(r.removedAt)}</span>
+              </div>
+            ))}
+          </div>
+        </details>
 
         <details className="fold">
           <summary>

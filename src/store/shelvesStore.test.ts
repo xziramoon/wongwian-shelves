@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useShelvesStore } from './shelvesStore';
+import { loadData, useShelvesStore } from './shelvesStore';
 import { SHELVES_STORAGE_KEY } from '../constants';
 
 function resetStore() {
@@ -171,6 +171,51 @@ describe('shelvesStore — ยิงทวน (check)', () => {
     applyCheck(shelfId, rowIds['3'], ['111'], { addUnregistered: {}, keepMissing: {} });
     const row = useShelvesStore.getState().shelves[0].rows[0];
     expect(row.items.map((i) => i.barcode)).toEqual(['111', '222']);
+  });
+});
+
+describe('shelvesStore — corrupt data recovery', () => {
+  it('preserves the raw corrupted value under a _corrupt_<timestamp> key and returns empty data, without throwing', () => {
+    localStorage.setItem(SHELVES_STORAGE_KEY, '{not valid json');
+    let result;
+    expect(() => {
+      result = loadData();
+    }).not.toThrow();
+    expect(result).toEqual({ shelves: [], removed: [], editsSinceBackup: 0, lastBackupAt: null });
+
+    const corruptKey = Object.keys(localStorage).find((k) => k.startsWith(`${SHELVES_STORAGE_KEY}_corrupt_`));
+    expect(corruptKey).toBeDefined();
+    expect(localStorage.getItem(corruptKey!)).toBe('{not valid json');
+    // the original key itself is untouched by the recovery (not overwritten until
+    // the next real persist() call)
+    expect(localStorage.getItem(SHELVES_STORAGE_KEY)).toBe('{not valid json');
+  });
+
+  it('tolerates valid JSON with missing/wrong-shaped fields by defaulting them', () => {
+    localStorage.setItem(SHELVES_STORAGE_KEY, JSON.stringify({ shelves: 'not-an-array' }));
+    const result = loadData();
+    expect(result.shelves).toEqual([]);
+    expect(result.removed).toEqual([]);
+  });
+
+  it('importFile rejects a file with the wrong schema', () => {
+    const res = useShelvesStore.getState().importFile({ schema: 2, exportedAt: 0, shelves: [], removed: [] } as never);
+    expect(res.ok).toBe(false);
+  });
+
+  it('exportFile/importFile round-trip preserves shelves and removed history', () => {
+    const { shelfId, rowIds } = setupShelfWithRows(['1']);
+    useShelvesStore.getState().scanIn(shelfId, rowIds['1'], '111');
+    useShelvesStore.getState().scanOut(shelfId, rowIds['1'], '111');
+    const file = useShelvesStore.getState().exportFile();
+
+    resetStore();
+    expect(useShelvesStore.getState().shelves).toHaveLength(0);
+
+    const res = useShelvesStore.getState().importFile(file);
+    expect(res.ok).toBe(true);
+    expect(useShelvesStore.getState().shelves[0].code).toBe('A');
+    expect(useShelvesStore.getState().removed).toHaveLength(1);
   });
 });
 

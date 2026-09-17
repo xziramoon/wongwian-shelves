@@ -18,8 +18,10 @@ function emptyData(): ShelvesData {
   return { shelves: [], removed: [], editsSinceBackup: 0, lastBackupAt: null };
 }
 
-/* ข้อมูลเสียหาย (parse ไม่ได้) ห้ามเขียนทับทันที — เก็บค่าดิบไว้ก่อนแล้วเริ่มใหม่ */
-function loadData(): ShelvesData {
+/* ข้อมูลเสียหาย (parse ไม่ได้) ห้ามเขียนทับทันที — เก็บค่าดิบไว้ก่อนแล้วเริ่มใหม่
+ * exported เพื่อให้ unit test เรียกตรงๆ ได้ (module init จะเรียกครั้งเดียวตอนโหลด
+ * ตอนแรกเท่านั้น re-import ในเทสไม่สะดวก) */
+export function loadData(): ShelvesData {
   const raw = localStorage.getItem(SHELVES_STORAGE_KEY);
   if (!raw) return emptyData();
   try {
