@@ -1,32 +1,25 @@
-# React + TypeScript + Vite
+# wongwian-shelves
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+วงเวียน ลงทะเบียนชั้นวาง — แอปมือถือ (PWA) สำหรับร้านวงเวียน ใช้ลงทะเบียนว่าสินค้าตัวไหนอยู่ชั้นไหนแถวไหน แล้วพิมพ์ป้ายราคาเฉพาะที่ต้องเปลี่ยนได้ในครั้งเดียว โดยส่งงานพิมพ์ไปที่เครื่อง `TAG_PRINTER.html` เดิม (ของ [wongwian-tags01](https://github.com/xziramoon/wongwian-tags01)) ผ่าน Ably เหมือนแอป [wongwian-tags-mobile](https://github.com/xziramoon/wongwian-tags-mobile)
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+React + TypeScript + Vite + zustand + vite-plugin-pwa + @zxing/browser + ably + jsbarcode + papaparse
 
-## React Compiler
+## คำสั่งที่ใช้บ่อย
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+npm install
+npm run dev      # dev server
+npm run build    # type-check + build
+npm run test     # vitest
+npm run lint     # oxlint
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## โครงสร้างข้อมูล
+
+- ข้อมูลชั้น/แถว/สินค้า: `localStorage` key `wongwianShelves_v1`
+- ตั้งค่าหน้าตาป้าย: `localStorage` key `wongwianShelvesConfig_v1`
+- ฐานข้อมูลสินค้า (ชื่อ/ราคา) ไม่ได้เก็บซ้ำไว้ในแอปนี้ — ดึงสดจาก Google Sheet เดียวกับอีก 2 แอปทุกครั้งที่เปิด/พิมพ์
+
+ดูรายละเอียดสเปกทั้งหมดในเอกสาร prompt ที่ใช้สร้างแอปนี้ (เก็บแยกไว้นอก repo)
