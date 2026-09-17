@@ -8,6 +8,7 @@ import SettingsSheet from './components/SettingsSheet';
 import HomeScreen from './components/HomeScreen';
 import ShelfScreen from './components/ShelfScreen';
 import RowScreen from './components/RowScreen';
+import PrintScreen from './components/PrintScreen';
 
 /* maps Ably's connection.state values to the coarser 3-state pill the UI shows —
  * ported verbatim from wongwian-tags-mobile/src/App.tsx */
@@ -53,11 +54,7 @@ function App() {
       {screen.name === 'home' && <HomeScreen />}
       {screen.name === 'shelf' && <ShelfScreen shelfId={screen.shelfId} />}
       {screen.name === 'row' && <RowScreen shelfId={screen.shelfId} rowId={screen.rowId} />}
-      {screen.name === 'print' && (
-        <div style={{ padding: 24, textAlign: 'center', color: 'var(--txt2)' }}>
-          <p>หน้าพิมพ์ — เพิ่มในคอมมิตถัดไป</p>
-        </div>
-      )}
+      {screen.name === 'print' && <PrintScreen />}
 
       <SettingsSheet />
       <ToastContainer />
