@@ -1,0 +1,100 @@
+/* ============================================================
+ * ⚠️ ห้ามแก้ — ยกมาจาก wongwian-tags01/src/styles/tag.css ตรงตัวทุกตัวอักษร
+ * (.price-tag layout ทั้งชุด + @media print) คำนวณเป็น cm/mm
+ * อย่างละเอียดเพื่อให้พิมพ์ลง A4 พอดีและแก้ปัญหาสระไทยตกขอบ
+ * ============================================================ */
+
+/* ============ TAG STYLES (fixed Thai vowel clipping) ============ */
+.price-tag { background:#fff; border:2px solid #000; display:flex; flex-direction:column; box-sizing:border-box; page-break-inside:avoid; font-family:var(--f-tag); position:relative; height: var(--tag-h); width: var(--tag-w); overflow:hidden; cursor:pointer; }
+.tag-ribbon { position: absolute; top: var(--ribbon-y); right: var(--ribbon-x); background: #000; color: #fff; font-size: var(--ribbon-f-sz); font-weight: 800; padding: 3px 45px; transform: rotate(45deg); z-index: 10; text-align: center; }
+.tag-header  { background:#000; color:#fff; text-align:center; font-size:10px; font-weight:800; padding:3px 0; letter-spacing:1px; flex: 0 0 18px; overflow: visible; line-height:1.3; }
+.tag-name-area { flex: 0 0 36px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2px 4px; border-bottom:1px solid #000; overflow: hidden; }
+.tag-name { font-weight:600; text-align:center; line-height:1.25; color:#000; width: 100%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break: break-word; padding:1px 0; }
+.tag-date-txt { font-size: 8px; font-weight: 600; color: #444; letter-spacing: 0.3px; line-height: 1.3; margin-top:1px;}
+.tag-mid-std { flex: 1 1 auto; display:flex; justify-content:space-between; align-items:flex-end; padding:2px 5px; overflow: hidden; gap:4px; }
+.tag-img-side { flex:0 0 auto; width:38%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.tag-img-side img { max-width:100%; max-height:100%; object-fit:contain; }
+.tag-info { display:flex; flex-direction:column; font-size:var(--meta-sz); color:#000; line-height:1.35; justify-content:flex-end; padding-bottom:1px;}
+.badge { background:#000; color:#fff; font-size:calc(var(--meta-sz) - 1px); font-weight:800; padding:1px 4px; border-radius:2px; margin-right:2px; display:inline-block; line-height:1.35; }
+.tag-price-wrap { display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; min-width: 0; }
+.tag-old { font-size:10px; color:#555; margin-bottom: -1px; text-decoration: line-through; line-height:1.3; }
+.tag-price-container { display: flex; align-items: baseline; justify-content: flex-end; width: 100%; }
+.tag-price-slide { transition: transform 0.2s; line-height: 0.95; }
+.tag-price { font-size:var(--price-sz); font-weight:900; letter-spacing:-1px; color:#000; }
+.tag-baht-anchor { margin-left: 2px; flex-shrink: 0; z-index: 2; }
+.tag-baht-inv  { background:#000; color:#fff; font-size:10px; font-weight:800; padding:2px 4px; border-radius:2px; }
+.tag-baht-norm { font-size:11px; font-weight:800; color:#000; }
+
+/* dual mode A (original refined) */
+.tag-mid-dual { flex: 1 1 auto; min-height:0; display: flex; justify-content: space-between; align-items: center; padding: 3px 3px; overflow: hidden; gap:3px; }
+.dual-col { display: flex; flex-direction: column; align-items: center; justify-content:center; flex:1 1 0; min-width:0; max-width:50%; overflow:hidden; }
+.dual-div { width: 1px; align-self:stretch; border-right: 1px dashed #000; margin:4px 0; }
+.dual-badge { background: #000; color: #fff; font-size: calc(var(--meta-sz) - 1px); font-weight: 800; padding: 2px 6px; border-radius: 2px; margin-bottom: 3px; text-align: center; white-space: nowrap; line-height:1.35; max-width:100%; overflow:hidden; text-overflow:ellipsis; flex-shrink:0; }
+.dual-price-row { display: flex; align-items: baseline; justify-content:center; width:100%; min-width:0; overflow:hidden; }
+.dual-price-val { font-size: var(--dual-price-sz); font-weight: 900; color: #000; letter-spacing: 0; line-height: 1.05; white-space:nowrap; min-width:0; }
+.dual-baht { font-size: calc(var(--meta-sz) - 1px); font-weight: 800; color: #000; margin-left: 3px; flex-shrink:0; white-space:nowrap; }
+
+/* dual mode B (hero + wholesale strip) */
+.tag-mid-hero { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding:2px 6px 3px; overflow:hidden; }
+.hero-top { flex:1 1 auto; min-height:0; display:flex; align-items:center; justify-content:space-between; gap:5px; overflow:hidden; }
+.hero-meta { display:flex; flex-direction:column; font-size:var(--meta-sz); color:#000; line-height:1.35; min-width:0; overflow:hidden; }
+.hero-price-box { display:flex; align-items:baseline; flex-shrink:0; white-space:nowrap; }
+.hero-price { font-size:var(--price-sz); font-weight:900; letter-spacing:-1px; color:#000; line-height:1; white-space:nowrap; }
+.hero-baht { font-size:11px; font-weight:800; margin-left:2px; flex-shrink:0; }
+.wholesale-strip { background:#000; color:#fff; display:flex; align-items:center; justify-content:center; gap:6px; padding:2px 6px; margin-top:2px; border-radius:2px; overflow:hidden; min-width:0; flex-shrink:0; }
+.ws-label { font-size:calc(var(--meta-sz) - 1px); font-weight:700; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+.ws-price { font-size:calc(var(--dual-price-sz) * 0.72); font-weight:900; line-height:1.1; white-space:nowrap; flex-shrink:0; }
+.ws-baht { font-size:calc(var(--meta-sz) - 1px); font-weight:700; white-space:nowrap; flex-shrink:0; }
+
+.tag-bc-area { flex: 0 0 42px; text-align:center; display:flex; justify-content:center; align-items:center; padding:2px 0; overflow: hidden; border-top: 1px dashed #000;}
+.tag-bc-area svg { max-width:98%; max-height:100%; }
+
+.price-tag-large { width: var(--large-w); height: var(--large-h); }
+.tag-name-area-large { flex: 0 0 46px; display:flex; align-items:center; justify-content:center; padding: 4px 10px; border-bottom: 2px solid #000; text-align: center; overflow: hidden;}
+.tag-name-large { font-weight:700; color:#000; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+.tag-large-body { flex: 1 1 auto; display: flex; border-bottom: 1px dashed #000; overflow:hidden;}
+.tag-large-left { width: 50%; padding: 5px 10px; display: flex; flex-direction: column; justify-content: center; font-size: calc(var(--meta-sz) + 2px); font-weight: 700; color: #000; line-height: 1.55; }
+.tag-large-img { max-width:80%; max-height:52px; object-fit:contain; margin:2px auto; }
+.tag-large-box { border: 2px solid #000; display: inline-flex; flex-direction: column; align-items: center; margin-top: 5px; border-radius: 4px; padding: 4px 10px; align-self: flex-start; }
+.tag-large-box-title { font-size: 10px; font-weight: 800; text-transform: uppercase; line-height: 1.2; }
+.tag-large-box-price { font-size: calc(var(--meta-sz) + 6px); font-weight: 900; line-height: 1.1; margin-top: 2px; }
+.tag-large-divider { width: 1px; border-right: 1px dashed #000; }
+.tag-large-right { width: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.tag-price-large { font-size: calc(var(--price-sz) * 1.3); font-weight: 900; letter-spacing: -1px; line-height: 0.95; color: #000; }
+.tag-baht-large { font-size: calc(var(--meta-sz) + 6px); font-weight: 800; color: #000; margin-left: 8px; }
+.pack-icon { display:inline-block; font-size:calc(var(--meta-sz) + 2px); margin-right:3px; }
+
+@media print {
+  @page { margin:0; size: auto; }
+  body { background:#fff !important; color:#000 !important; overflow:visible; animation:none; }
+  body::after, .scan-beam, .sidebar, .fab-top, .ws-fab-top, .modal-overlay { display:none !important; }
+  .workspace { display:block; padding:0; overflow:visible; background:#fff !important; }
+  .workspace::before, .workspace::after { display:none !important; }
+  #print-area { width:100%; box-shadow:none !important; padding:2mm; gap:2mm; border:none !important; background:#fff !important; }
+  .empty-msg { display:none !important; }
+  .price-tag { border: 2px solid #000 !important; background:#fff !important; box-shadow:none !important; transform:none !important; }
+  .tag-header, .tag-ribbon, .badge, .tag-baht-inv, .dual-badge, .wholesale-strip { background:#000 !important; color:#fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wholesale-strip * { color:#fff !important; }
+  .tag-name, .tag-price, .tag-info, .tag-baht-norm, .tag-old, .dual-price-val, .dual-baht, .tag-large-left, .tag-price-large, .tag-baht-large, .tag-date-txt, .hero-price, .hero-baht, .hero-meta { color:#000 !important; }
+  .tag-name-area, .tag-name-area-large, .tag-large-box { border-color: #000 !important; }
+  .tag-bc-area { border-top: 1px dashed #000 !important; }
+  .tag-large-body { border-bottom: 1px dashed #000 !important; }
+  .dual-div, .tag-large-divider { border-right: 1px dashed #000 !important; }
+}
+
+/* ============ LOC HEADER (รหัสชั้น-แถว บนหัวป้าย) — ต้องตรงกับ wongwian-tags01 tag.css ============ */
+.tag-header.hs { display:flex; align-items:center; gap:3px; padding:3px 2px; letter-spacing:0; }
+.hs-name { flex:1 1 auto; min-width:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:1px; }
+.loc-chip { flex:0 0 auto; background:#fff; color:#000; font-size:11px; font-weight:900; line-height:12px; padding:0 4px; border-radius:2px; white-space:nowrap; }
+.tag-header.hl { font-size:11px; letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tag-bc-area.has-date { position:relative; }
+.bc-date { position:absolute; right:2px; bottom:1px; font-size:8px; font-weight:700; line-height:1; background:#fff; color:#000; padding:0 1px; white-space:nowrap; }
+
+@media print {
+  .loc-chip, .bc-date { background:#fff !important; color:#000 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+
+/* ============ OOS STRIP (แถบสินค้าหมด — ปิดทับช่องราคาของป้ายเดิม) ============ */
+.price-tag-oos { width: var(--oos-w); height: var(--oos-h); background:#000; flex-direction:row; align-items:center; justify-content:center; gap:8px; padding:0 8px; }
+.oos-main { color:#fff; font-size:var(--oos-sz); font-weight:900; letter-spacing:2px; line-height:1; white-space:nowrap; }
+.oos-eta  { color:#fff; font-size:calc(var(--meta-sz) + 1px); font-weight:700; border-left:1px solid #fff; padding-left:8px; white-space:nowrap; }
