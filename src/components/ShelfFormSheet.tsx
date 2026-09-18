@@ -36,49 +36,38 @@ export default function ShelfFormSheet({ open, onClose }: Props) {
   };
 
   return (
-    <div className="sheet-backdrop" onClick={handleClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="sheet-handle" />
-        <div className="queue-drawer-header">
-          <span>เพิ่มชั้นวาง</span>
-          <button type="button" className="sheet-close" onClick={handleClose} aria-label="ปิด">
-            ✕
+    <div className="ios-sheet-backdrop" onClick={handleClose}>
+      <div className="ios-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="ios-sheet-handle" />
+        <div className="ios-sheet-header">
+          <button type="button" className="ios-btn plain" onClick={handleClose}>
+            ยกเลิก
+          </button>
+          <span className="ios-sheet-title">เพิ่มชั้นวาง</span>
+          <button type="button" className="ios-btn plain" onClick={handleAdd}>
+            เพิ่ม
           </button>
         </div>
 
-        <label className="field-label" htmlFor="shelf-code">
-          รหัสชั้น (1-2 ตัวอักษร)
-        </label>
-        <input
-          id="shelf-code"
-          className="field-input"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="เช่น A, B2"
-          maxLength={2}
-          autoFocus
-        />
+        <div className="ios-body" style={{ padding: '4px 0 16px', gap: 14 }}>
+          <div className="ios-field">
+            <span className="ios-field-label">รหัสชั้น (1-2 ตัวอักษร)</span>
+            <input
+              className="ios-input"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="เช่น A, B2"
+              maxLength={2}
+              autoFocus
+            />
+          </div>
 
-        <label className="field-label" htmlFor="shelf-name">
-          ชื่อเรียก (ไม่บังคับ)
-        </label>
-        <input
-          id="shelf-name"
-          className="field-input"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="เช่น ชั้นขนม"
-        />
+          <div className="ios-field">
+            <span className="ios-field-label">ชื่อเรียก (ไม่บังคับ)</span>
+            <input className="ios-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="เช่น ชั้นขนม" />
+          </div>
 
-        {error && <div className="form-error">{error}</div>}
-
-        <div className="sheet-actions">
-          <button type="button" className="btn btn-secondary" onClick={handleClose}>
-            ยกเลิก
-          </button>
-          <button type="button" className="btn btn-primary" onClick={handleAdd}>
-            เพิ่มชั้น
-          </button>
+          {error && <div className="ios-banner red">{error}</div>}
         </div>
       </div>
     </div>

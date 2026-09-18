@@ -4,6 +4,8 @@ import { computeShelfStats, computeTotalReprintCount } from '../lib/shelfStats';
 import { pickRowsToCheck } from '../lib/shelfHelpers';
 import { useShelvesStore } from '../store/shelvesStore';
 import { useUIStore } from '../store/uiStore';
+import IosNavBar from './IosNavBar';
+import ConnectionStatus from './ConnectionStatus';
 import ShelfFormSheet from './ShelfFormSheet';
 
 function fmtTime(d: Date) {
@@ -26,10 +28,14 @@ export default function HomeScreen() {
   const [syncing, setSyncing] = useState(false);
   const [addShelfOpen, setAddShelfOpen] = useState(false);
 
-  useEffect(() => database.onChange((data) => {
-    setDbCount(data.length);
-    setLastSync(new Date());
-  }), []);
+  useEffect(
+    () =>
+      database.onChange((data) => {
+        setDbCount(data.length);
+        setLastSync(new Date());
+      }),
+    [],
+  );
 
   const handleReload = () => {
     setSyncing(true);
@@ -48,70 +54,111 @@ export default function HomeScreen() {
   const totalReprint = computeTotalReprintCount(shelves);
 
   return (
-    <div className="screen home-screen">
-      <div className="home-header">
-        <div className="home-header-info">
-          <span>สินค้าในฐานข้อมูล {dbCount.toLocaleString()} รายการ</span>
-          {lastSync && <span className="home-header-time"> · โหลดล่าสุด {fmtTime(lastSync)}</span>}
-        </div>
-        <button type="button" className="btn btn-secondary" onClick={handleReload} disabled={syncing}>
-          {syncing ? 'กำลังโหลด...' : '↻ โหลดใหม่'}
-        </button>
-      </div>
-
-      {needsBackupReminder && (
-        <div className="warn-banner">⚠ ยังไม่ได้สำรองข้อมูล — เข้าเมนูตั้งค่าเพื่อสำรอง</div>
-      )}
-
-      {checkRows.length > 0 && (
-        <div className="panel check-today-card">
-          <div className="p-lbl">ตรวจวันนี้</div>
-          <div className="check-today-list">
-            {checkRows.map((r) => (
-              <button
-                type="button"
-                key={r.rowId}
-                className="btn btn-secondary check-today-btn"
-                onClick={() => handleCheckToday(r.shelfId, r.rowId)}
-              >
-                ชั้น {r.shelfCode} · แถว {r.rowNo}
+    <>
+      <IosNavBar
+        title="ชั้นวาง"
+        trailing={
+          <>
+            <ConnectionStatus />
+            <button
+              type="button"
+              className="ios-nav-icon-btn"
+              onClick={() => setSettingsSheetOpen(true)}
+              aria-label="ตั้งค่า"
+            >
+              ⚙
+            </button>
+          </>
+        }
+      />
+      <div className="ios-body">
+        <div className="ios-section">
+          <div className="ios-list">
+            <div className="ios-row" style={{ cursor: 'default' }}>
+              <div className="ios-row-icon" style={{ background: 'var(--ios-blue-tint-bg)' }}>
+                📦
+              </div>
+              <div className="ios-row-main">
+                <div className="ios-row-title">สินค้าในฐานข้อมูล {dbCount.toLocaleString()} รายการ</div>
+                {lastSync && <div className="ios-row-subtitle">โหลดล่าสุด {fmtTime(lastSync)}</div>}
+              </div>
+              <button type="button" className="ios-btn tinted sm" onClick={handleReload} disabled={syncing}>
+                {syncing ? 'กำลังโหลด' : 'โหลดใหม่'}
               </button>
-            ))}
+            </div>
           </div>
         </div>
-      )}
 
-      <button type="button" className="btn btn-primary btn-block print-cta" onClick={goPrint}>
-        🖨 พิมพ์ป้ายที่ต้องเปลี่ยน ({totalReprint} ใบ)
-      </button>
+        {needsBackupReminder && (
+          <div className="ios-banner">
+            <span>⚠️ ยังไม่ได้สำรองข้อมูลนาน — เข้าตั้งค่าเพื่อสำรอง</span>
+          </div>
+        )}
 
-      <div className="shelf-grid">
-        {shelves.map((shelf) => {
-          const stats = computeShelfStats(shelf);
-          return (
-            <button type="button" key={shelf.id} className="shelf-card" onClick={() => goShelf(shelf.id)}>
-              <div className="shelf-card-code">{shelf.code}</div>
-              {shelf.name && <div className="shelf-card-name">{shelf.name}</div>}
-              <div className="shelf-card-meta">
-                {stats.rowCount} แถว · {stats.itemCount} รายการ
-              </div>
-              {stats.reprintCount > 0 && <div className="shelf-card-badge badge-warn">ต้องเปลี่ยน {stats.reprintCount}</div>}
-              {stats.pendingCount > 0 && <div className="shelf-card-badge badge-pending">รอเข้าระบบ {stats.pendingCount}</div>}
-            </button>
-          );
-        })}
-        <button type="button" className="shelf-card shelf-card-add" onClick={() => setAddShelfOpen(true)}>
-          + เพิ่มชั้น
+        {checkRows.length > 0 && (
+          <div className="ios-section">
+            <div className="ios-section-header">ตรวจวันนี้</div>
+            <div className="ios-list">
+              {checkRows.map((r) => (
+                <button type="button" className="ios-row" key={r.rowId} onClick={() => handleCheckToday(r.shelfId, r.rowId)}>
+                  <div className="ios-row-icon" style={{ background: 'var(--ios-blue-tint-bg)' }}>
+                    🔵
+                  </div>
+                  <div className="ios-row-main">
+                    <div className="ios-row-title">
+                      ชั้น {r.shelfCode} · แถว {r.rowNo}
+                    </div>
+                  </div>
+                  <span className="ios-chevron">›</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button type="button" className="ios-btn filled block" style={{ fontSize: 17, minHeight: 50 }} onClick={goPrint}>
+          🖨️ พิมพ์ป้ายที่ต้องเปลี่ยน ({totalReprint} ใบ)
         </button>
-      </div>
 
-      <div className="home-footer-links">
-        <button type="button" className="btn btn-secondary" onClick={() => setSettingsSheetOpen(true)}>
-          ตั้งค่า / สำรองข้อมูล
-        </button>
+        {shelves.length > 0 ? (
+          <div className="ios-section">
+            <div className="ios-section-header">ชั้นวางทั้งหมด</div>
+            <div className="ios-grid-2">
+              {shelves.map((shelf) => {
+                const stats = computeShelfStats(shelf);
+                return (
+                  <button type="button" key={shelf.id} className="ios-tile" onClick={() => goShelf(shelf.id)}>
+                    <div className="ios-tile-code">{shelf.code}</div>
+                    {shelf.name && <div className="ios-tile-name">{shelf.name}</div>}
+                    <div className="ios-tile-pills">
+                      {stats.reprintCount > 0 && <span className="ios-pill orange">เปลี่ยน {stats.reprintCount}</span>}
+                      {stats.pendingCount > 0 && <span className="ios-pill red">รอเข้าระบบ {stats.pendingCount}</span>}
+                    </div>
+                    <div className="ios-tile-meta">
+                      {stats.rowCount} แถว · {stats.itemCount} รายการ
+                    </div>
+                  </button>
+                );
+              })}
+              <button type="button" className="ios-tile add" onClick={() => setAddShelfOpen(true)}>
+                + เพิ่มชั้น
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="ios-empty">
+            <div className="ios-empty-icon">🗄️</div>
+            ยังไม่มีชั้นวาง
+            <div style={{ marginTop: 16 }}>
+              <button type="button" className="ios-btn filled" onClick={() => setAddShelfOpen(true)}>
+                + เพิ่มชั้นแรก
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <ShelfFormSheet open={addShelfOpen} onClose={() => setAddShelfOpen(false)} />
-    </div>
+    </>
   );
 }

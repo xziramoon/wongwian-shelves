@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { database } from './lib/database';
 import { printBridge, type AblyConnState } from './lib/printBridge';
 import { useUIStore } from './store/uiStore';
-import ConnectionStatus from './components/ConnectionStatus';
 import ToastContainer from './components/ToastContainer';
 import SettingsSheet from './components/SettingsSheet';
 import HomeScreen from './components/HomeScreen';
@@ -21,7 +20,6 @@ function toAblyStatus(state: AblyConnState): 'connecting' | 'connected' | 'offli
 function App() {
   const setAblyStatus = useUIStore((s) => s.setAblyStatus);
   const showToast = useUIStore((s) => s.showToast);
-  const setSettingsSheetOpen = useUIStore((s) => s.setSettingsSheetOpen);
   const screen = useUIStore((s) => s.screen);
 
   useEffect(() => {
@@ -40,17 +38,7 @@ function App() {
   }, [setAblyStatus, showToast]);
 
   return (
-    <div className="app-shell">
-      <ConnectionStatus />
-      <button
-        type="button"
-        className="settings-gear-btn"
-        onClick={() => setSettingsSheetOpen(true)}
-        aria-label="ตั้งค่าป้ายราคา"
-      >
-        ⚙
-      </button>
-
+    <div className="ios-app">
       {screen.name === 'home' && <HomeScreen />}
       {screen.name === 'shelf' && <ShelfScreen shelfId={screen.shelfId} />}
       {screen.name === 'row' && <RowScreen shelfId={screen.shelfId} rowId={screen.rowId} />}

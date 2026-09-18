@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useShelvesStore } from '../store/shelvesStore';
 import { useUIStore } from '../store/uiStore';
+import IosNavBar from './IosNavBar';
 import RowFormSheet from './RowFormSheet';
 
 function fmtAgo(ts: number | null): string {
@@ -70,67 +71,77 @@ export default function ShelfScreen({ shelfId }: Props) {
   };
 
   return (
-    <div className="screen">
-      <div className="shelf-screen-header">
-        <button type="button" className="back-btn" onClick={goHome}>
-          ‹ กลับหน้าหลัก
+    <>
+      <IosNavBar title={`ชั้น ${shelf.code}`} subtitle={shelf.name || undefined} onBack={goHome} backLabel="ชั้นวาง" />
+      <div className="ios-body">
+        <div className="ios-section">
+          <div className="ios-list">
+            <button type="button" className="ios-row" onClick={handleRenameShelf}>
+              <div className="ios-row-main">
+                <div className="ios-row-title">แก้ไขรหัส/ชื่อชั้น</div>
+              </div>
+              <span className="ios-chevron">›</span>
+            </button>
+            <button type="button" className="ios-row" onClick={handleDeleteShelf} style={{ color: 'var(--ios-red)' }}>
+              <div className="ios-row-main">
+                <div className="ios-row-title" style={{ color: 'var(--ios-red)' }}>
+                  ลบชั้นนี้
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div className="ios-section">
+          <div className="ios-section-header">แถวในชั้นนี้</div>
+          {shelf.rows.length > 0 ? (
+            <div className="ios-list">
+              {shelf.rows.map((row) => (
+                <div className="ios-row" key={row.id} onClick={() => goRow(shelfId, row.id)}>
+                  <div className="ios-row-icon" style={{ background: 'var(--ios-fill-tertiary)', fontWeight: 700 }}>
+                    {row.no}
+                  </div>
+                  <div className="ios-row-main">
+                    <div className="ios-row-title">{row.items.length} รายการ</div>
+                    <div className="ios-row-subtitle">{fmtAgo(row.lastCheckedAt)}</div>
+                  </div>
+                  <button
+                    type="button"
+                    className="ios-nav-icon-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRenameRow(row.id, row.no);
+                    }}
+                    aria-label="เปลี่ยนเลขแถว"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    type="button"
+                    className="ios-nav-icon-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveRow(row.id, row.no);
+                    }}
+                    aria-label="ลบแถว"
+                  >
+                    🗑
+                  </button>
+                  <span className="ios-chevron">›</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="ios-empty">ยังไม่มีแถวในชั้นนี้</div>
+          )}
+        </div>
+
+        <button type="button" className="ios-btn tinted block" onClick={() => setAddRowShelfId(shelfId)}>
+          + เพิ่มแถว
         </button>
       </div>
 
-      <div className="panel">
-        <div className="p-lbl">
-          ชั้น {shelf.code}
-          {shelf.name && ` · ${shelf.name}`}
-        </div>
-        <div className="shelf-screen-actions">
-          <button type="button" className="btn btn-secondary" onClick={handleRenameShelf}>
-            แก้ไขรหัส/ชื่อ
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={handleDeleteShelf}>
-            ลบชั้นนี้
-          </button>
-        </div>
-      </div>
-
-      <div className="row-list">
-        {shelf.rows.map((row) => (
-          <div key={row.id} className="row-card" onClick={() => goRow(shelfId, row.id)}>
-            <div className="row-card-no">{row.no}</div>
-            <div className="row-card-info">
-              <div>{row.items.length} รายการ</div>
-              <div className="row-card-meta">{fmtAgo(row.lastCheckedAt)}</div>
-            </div>
-            <button
-              type="button"
-              className="icon-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRenameRow(row.id, row.no);
-              }}
-              aria-label="เปลี่ยนเลขแถว"
-            >
-              ✎
-            </button>
-            <button
-              type="button"
-              className="icon-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemoveRow(row.id, row.no);
-              }}
-              aria-label="ลบแถว"
-            >
-              🗑
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <button type="button" className="btn btn-secondary btn-block" onClick={() => setAddRowShelfId(shelfId)}>
-        + เพิ่มแถว
-      </button>
-
       <RowFormSheet shelfId={addRowShelfId} onClose={() => setAddRowShelfId(null)} />
-    </div>
+    </>
   );
 }

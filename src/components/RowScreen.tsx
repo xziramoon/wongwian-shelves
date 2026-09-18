@@ -8,6 +8,7 @@ import { needsReprint } from '../lib/needsReprint';
 import { buildLoc } from '../lib/shelfHelpers';
 import { fmtPrice } from '../lib/utils';
 import { feedback } from '../lib/feedback';
+import IosNavBar from './IosNavBar';
 import RowCamera from './RowCamera';
 import ManualSearchSheet from './ManualSearchSheet';
 import CheckSummaryView from './CheckSummaryView';
@@ -122,176 +123,179 @@ export default function RowScreen({ shelfId, rowId }: Props) {
   const loc = buildLoc(shelf.code, row.no);
 
   return (
-    <div className="screen">
-      <div className="row-header">
-        <button type="button" className="back-btn" onClick={() => goShelf(shelfId)}>
-          ‹ ชั้น {shelf.code}
-        </button>
-        <div className="row-header-title">
-          {scanMode === 'in' && `กำลังเพิ่มเข้า ชั้น ${shelf.code} · แถว ${row.no}`}
-          {scanMode === 'out' && `กำลังยิงออก ชั้น ${shelf.code} · แถว ${row.no}`}
-          {scanMode === 'check' && `กำลังยิงทวน ชั้น ${shelf.code} · แถว ${row.no}`}
-        </div>
-        <div className="scan-mode-btns">
+    <>
+      <IosNavBar title={`ชั้น ${shelf.code} · แถว ${row.no}`} onBack={() => goShelf(shelfId)} backLabel={`ชั้น ${shelf.code}`} />
+      <div className="ios-body">
+        <div className="ios-segmented">
           <button
             type="button"
-            className={`scan-mode-btn mode-in${scanMode === 'in' ? ' active' : ''}`}
+            className={`ios-segmented-option tone-green${scanMode === 'in' ? ' active' : ''}`}
             onClick={() => setScanMode('in')}
           >
-            ยิงเข้า
+            🟢 ยิงเข้า
           </button>
           <button
             type="button"
-            className={`scan-mode-btn mode-out${scanMode === 'out' ? ' active' : ''}`}
+            className={`ios-segmented-option tone-red${scanMode === 'out' ? ' active' : ''}`}
             onClick={() => setScanMode('out')}
           >
-            ยิงออก
+            🔴 ยิงออก
           </button>
           <button
             type="button"
-            className={`scan-mode-btn mode-check${scanMode === 'check' ? ' active' : ''}`}
+            className={`ios-segmented-option tone-blue${scanMode === 'check' ? ' active' : ''}`}
             onClick={() => setScanMode('check')}
           >
-            ยิงทวน
+            🔵 ยิงทวน
           </button>
         </div>
-      </div>
 
-      {/* ปืนยิงบลูทูธ — input ที่ซ่อนไว้ รับ HID เสมอไม่ว่าจะสลับแท็บกล้อง/ปืนยิง */}
-      <input {...wedgeInputProps} className="wedge-input" aria-hidden="true" tabIndex={-1} />
-      <div className={`wedge-status ${wedgeStatus}`} onClick={() => wedgeInputProps.ref.current?.focus()}>
-        {wedgeStatus === 'ready' ? '🔫 พร้อมยิง' : 'แตะเพื่อเปิดรับปืน'}
-      </div>
+        {/* ปืนยิงบลูทูธ — input ที่ซ่อนไว้ รับ HID เสมอไม่ว่าจะสลับแท็บกล้อง/ปืนยิง */}
+        <input {...wedgeInputProps} className="wedge-input-hidden" aria-hidden="true" tabIndex={-1} />
+        <div className={`ios-scan-status ${wedgeStatus}`} onClick={() => wedgeInputProps.ref.current?.focus()}>
+          <span className="dot" />
+          {wedgeStatus === 'ready' ? 'พร้อมยิง' : 'แตะเพื่อเปิดรับปืน'}
+        </div>
 
-      <div className="input-method-tabs">
-        <button
-          type="button"
-          className={`input-method-tab${inputMethod === 'camera' ? ' active' : ''}`}
-          onClick={() => setInputMethod('camera')}
-        >
-          📷 กล้อง
-        </button>
-        <button
-          type="button"
-          className={`input-method-tab${inputMethod === 'gun' ? ' active' : ''}`}
-          onClick={() => setInputMethod('gun')}
-        >
-          🔫 ปืนยิง
-        </button>
-        <button type="button" className="input-method-tab" onClick={() => setManualSearchOpen(true)}>
-          🔍 ค้นหา
-        </button>
-      </div>
+        <div className="ios-segmented">
+          <button
+            type="button"
+            className={`ios-segmented-option${inputMethod === 'camera' ? ' active' : ''}`}
+            onClick={() => setInputMethod('camera')}
+          >
+            📷 กล้อง
+          </button>
+          <button
+            type="button"
+            className={`ios-segmented-option${inputMethod === 'gun' ? ' active' : ''}`}
+            onClick={() => setInputMethod('gun')}
+          >
+            🔫 ปืนยิง
+          </button>
+          <button type="button" className="ios-segmented-option" onClick={() => setManualSearchOpen(true)}>
+            🔍 ค้นหา
+          </button>
+        </div>
 
-      <RowCamera active={inputMethod === 'camera' && !anyDialogOpen} onDetect={handleCode} />
+        <RowCamera active={inputMethod === 'camera' && !anyDialogOpen} onDetect={handleCode} />
 
-      {scanMode === 'check' && (
-        <div className="panel">
-          <div className="p-lbl">ยิงแล้ว {checkScanned.length} ชิ้น</div>
-          <div className="check-today-list">
-            {checkScanned.map((b) => (
-              <span key={b} className="chip-btn">
-                {database.find(b)?.ProductName || b}
-              </span>
-            ))}
+        {scanMode === 'check' && (
+          <div className="ios-card">
+            <div className="ios-card-title">ยิงแล้ว {checkScanned.length} ชิ้น</div>
+            <div className="ios-tile-pills">
+              {checkScanned.map((b) => (
+                <span key={b} className="ios-pill gray">
+                  {database.find(b)?.ProductName || b}
+                </span>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="ios-btn filled block"
+              style={{ marginTop: 6 }}
+              disabled={!checkScanned.length}
+              onClick={() => setCheckSummaryOpen(true)}
+            >
+              เสร็จ — ดูสรุป
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-block"
-            disabled={!checkScanned.length}
-            onClick={() => setCheckSummaryOpen(true)}
-          >
-            เสร็จ — ดูสรุป
-          </button>
-        </div>
-      )}
+        )}
 
-      {scanMode !== 'check' && (
-        <div className="row-item-list">
-          {row.items.map((item) => {
-            const product = database.find(item.barcode);
-            const pending = !product;
-            const warn = product && needsReprint(item, loc, product, true);
-            return (
-              <div className="row-item" key={item.uid}>
-                {product?.Image && <img className="row-item-thumb" src={product.Image} />}
-                <div className="row-item-info">
-                  <div className="row-item-name">
-                    {product?.ProductName || `รหัส: ${item.barcode}`}
-                    {pending && <span className="row-item-flag flag-pending">รอเข้าระบบ</span>}
-                    {!pending && warn && <span className="row-item-flag flag-warn">ต้องเปลี่ยนป้าย</span>}
-                  </div>
-                  <div className="row-item-meta">
-                    {product ? `${fmtPrice(product.Price)} บาท · ${item.barcode}` : item.barcode}
-                  </div>
-                </div>
-                <div className="row-item-ctrl">
-                  <button type="button" className="icon-btn" onClick={() => updateItem(shelfId, rowId, item.uid, { printQty: Math.max(1, item.printQty - 1) })}>
-                    −
-                  </button>
-                  <span>{item.printQty}</span>
-                  <button type="button" className="icon-btn" onClick={() => updateItem(shelfId, rowId, item.uid, { printQty: item.printQty + 1 })}>
-                    +
-                  </button>
-                  <div className="row-item-move">
-                    <button type="button" className="icon-btn" onClick={() => moveItem(shelfId, rowId, item.uid, 'up')}>
-                      ▲
-                    </button>
-                    <button type="button" className="icon-btn" onClick={() => moveItem(shelfId, rowId, item.uid, 'down')}>
-                      ▼
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    onClick={() => {
-                      const removed = removeItemAt(shelfId, rowId, item.uid);
-                      if (removed) {
-                        setLastRemoved({ item: removed, expiresAt: Date.now() + UNDO_MS });
-                        setTimeout(() => setLastRemoved((cur) => (cur && cur.item.uid === removed.uid ? null : cur)), UNDO_MS + 100);
-                      }
-                    }}
-                    aria-label="ลบ"
-                  >
-                    🗑
-                  </button>
-                </div>
+        {scanMode !== 'check' && (
+          <div className="ios-section">
+            {row.items.length > 0 ? (
+              <div className="ios-list">
+                {row.items.map((item) => {
+                  const product = database.find(item.barcode);
+                  const pending = !product;
+                  const warn = product && needsReprint(item, loc, product, true);
+                  return (
+                    <div className="ios-row" key={item.uid} style={{ cursor: 'default', flexWrap: 'wrap' }}>
+                      {product?.Image && (
+                        <img
+                          src={product.Image}
+                          style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
+                        />
+                      )}
+                      <div className="ios-row-main">
+                        <div className="ios-row-title">{product?.ProductName || `รหัส: ${item.barcode}`}</div>
+                        <div className="ios-row-subtitle">
+                          {product ? `${fmtPrice(product.Price)} บาท · ${item.barcode}` : item.barcode}
+                        </div>
+                        <div className="ios-tile-pills" style={{ marginTop: 2 }}>
+                          {pending && <span className="ios-pill red">รอเข้าระบบ</span>}
+                          {!pending && warn && <span className="ios-pill orange">ต้องเปลี่ยนป้าย</span>}
+                        </div>
+                      </div>
+                      <div className="ios-row-trailing">
+                        <div className="ios-stepper">
+                          <button type="button" onClick={() => updateItem(shelfId, rowId, item.uid, { printQty: Math.max(1, item.printQty - 1) })}>
+                            −
+                          </button>
+                          <span className="ios-stepper-val">{item.printQty}</span>
+                          <button type="button" onClick={() => updateItem(shelfId, rowId, item.uid, { printQty: item.printQty + 1 })}>
+                            +
+                          </button>
+                        </div>
+                        <button type="button" className="ios-nav-icon-btn" onClick={() => moveItem(shelfId, rowId, item.uid, 'up')}>
+                          ▲
+                        </button>
+                        <button type="button" className="ios-nav-icon-btn" onClick={() => moveItem(shelfId, rowId, item.uid, 'down')}>
+                          ▼
+                        </button>
+                        <button
+                          type="button"
+                          className="ios-nav-icon-btn"
+                          onClick={() => {
+                            const removed = removeItemAt(shelfId, rowId, item.uid);
+                            if (removed) {
+                              setLastRemoved({ item: removed, expiresAt: Date.now() + UNDO_MS });
+                              setTimeout(() => setLastRemoved((cur) => (cur && cur.item.uid === removed.uid ? null : cur)), UNDO_MS + 100);
+                            }
+                          }}
+                          aria-label="ลบ"
+                        >
+                          🗑
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-          {!row.items.length && <div className="row-card-meta">ยังไม่มีสินค้าในแถวนี้ — ยิงบาร์โค้ดเพื่อเริ่มเพิ่ม</div>}
-        </div>
-      )}
+            ) : (
+              <div className="ios-empty">ยังไม่มีสินค้าในแถวนี้ — ยิงบาร์โค้ดเพื่อเริ่มเพิ่ม</div>
+            )}
+          </div>
+        )}
 
-      {lastRemoved && (
-        <div className="warn-banner">
-          เอาออกแล้ว
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={{ marginLeft: 10 }}
-            onClick={() => {
-              restoreItem(shelfId, rowId, lastRemoved.item);
-              setLastRemoved(null);
-            }}
-          >
-            เลิกทำ
-          </button>
-        </div>
-      )}
+        {lastRemoved && (
+          <div className="ios-banner">
+            <span>เอาออกแล้ว</span>
+            <button
+              type="button"
+              className="ios-btn tinted sm"
+              onClick={() => {
+                restoreItem(shelfId, rowId, lastRemoved.item);
+                setLastRemoved(null);
+              }}
+            >
+              เลิกทำ
+            </button>
+          </div>
+        )}
+      </div>
 
       {pendingDuplicate && (
-        <div className="sheet-backdrop" onClick={() => setPendingDuplicate(null)}>
-          <div className="sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="sheet-handle" />
-            <div className="p-lbl">สินค้านี้อยู่ในแถวนี้แล้ว</div>
-            <div className="sheet-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => setPendingDuplicate(null)}>
-                ยกเลิก
-              </button>
+        <div className="ios-sheet-backdrop" onClick={() => setPendingDuplicate(null)}>
+          <div className="ios-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="ios-sheet-handle" />
+            <div className="ios-body" style={{ padding: '4px 0 16px', gap: 12 }}>
+              <div className="ios-card-title" style={{ textAlign: 'center' }}>
+                สินค้านี้อยู่ในแถวนี้แล้ว
+              </div>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="ios-btn filled block"
                 onClick={() => {
                   confirmDuplicateInRow(shelfId, rowId, pendingDuplicate);
                   setPendingDuplicate(null);
@@ -300,20 +304,25 @@ export default function RowScreen({ shelfId, rowId }: Props) {
               >
                 +1 ป้าย
               </button>
+              <button type="button" className="ios-btn tinted gray block" onClick={() => setPendingDuplicate(null)}>
+                ยกเลิก
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {pendingElsewhereIn && (
-        <div className="sheet-backdrop" onClick={() => setPendingElsewhereIn(null)}>
-          <div className="sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="sheet-handle" />
-            <div className="p-lbl">สินค้านี้อยู่ที่ {pendingElsewhereIn.loc} แล้ว</div>
-            <div className="sheet-actions" style={{ flexDirection: 'column' }}>
+        <div className="ios-sheet-backdrop" onClick={() => setPendingElsewhereIn(null)}>
+          <div className="ios-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="ios-sheet-handle" />
+            <div className="ios-body" style={{ padding: '4px 0 16px', gap: 10 }}>
+              <div className="ios-card-title" style={{ textAlign: 'center' }}>
+                สินค้านี้อยู่ที่ {pendingElsewhereIn.loc} แล้ว
+              </div>
               <button
                 type="button"
-                className="btn btn-primary btn-block"
+                className="ios-btn filled block"
                 onClick={() => {
                   confirmMoveHere(shelfId, rowId, pendingElsewhereIn.barcode);
                   setPendingElsewhereIn(null);
@@ -323,7 +332,7 @@ export default function RowScreen({ shelfId, rowId }: Props) {
               </button>
               <button
                 type="button"
-                className="btn btn-secondary btn-block"
+                className="ios-btn tinted block"
                 onClick={() => {
                   confirmAddBothLocations(shelfId, rowId, pendingElsewhereIn.barcode);
                   setPendingElsewhereIn(null);
@@ -331,7 +340,7 @@ export default function RowScreen({ shelfId, rowId }: Props) {
               >
                 อยู่ทั้งสองที่
               </button>
-              <button type="button" className="btn btn-secondary btn-block" onClick={() => setPendingElsewhereIn(null)}>
+              <button type="button" className="ios-btn tinted gray block" onClick={() => setPendingElsewhereIn(null)}>
                 ยกเลิก
               </button>
             </div>
@@ -340,17 +349,16 @@ export default function RowScreen({ shelfId, rowId }: Props) {
       )}
 
       {pendingElsewhereOut && (
-        <div className="sheet-backdrop" onClick={() => setPendingElsewhereOut(null)}>
-          <div className="sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="sheet-handle" />
-            <div className="p-lbl">สินค้านี้อยู่ที่ {pendingElsewhereOut.loc}</div>
-            <div className="sheet-actions">
-              <button type="button" className="btn btn-secondary" onClick={() => setPendingElsewhereOut(null)}>
-                ยกเลิก
-              </button>
+        <div className="ios-sheet-backdrop" onClick={() => setPendingElsewhereOut(null)}>
+          <div className="ios-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="ios-sheet-handle" />
+            <div className="ios-body" style={{ padding: '4px 0 16px', gap: 12 }}>
+              <div className="ios-card-title" style={{ textAlign: 'center' }}>
+                สินค้านี้อยู่ที่ {pendingElsewhereOut.loc}
+              </div>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="ios-btn filled red block"
                 onClick={() => {
                   confirmRemoveFromElsewhere(pendingElsewhereOut.barcode);
                   setPendingElsewhereOut(null);
@@ -360,12 +368,15 @@ export default function RowScreen({ shelfId, rowId }: Props) {
               >
                 เอาออกจาก {pendingElsewhereOut.loc}
               </button>
+              <button type="button" className="ios-btn tinted gray block" onClick={() => setPendingElsewhereOut(null)}>
+                ยกเลิก
+              </button>
             </div>
           </div>
         </div>
       )}
 
       <ManualSearchSheet onPick={handleCode} />
-    </div>
+    </>
   );
 }

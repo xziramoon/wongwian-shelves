@@ -32,16 +32,17 @@ export default function SliderRow({ configKey, full }: Props) {
   };
 
   return (
-    <div className={`slider-row${full ? ' cfg-full' : ''}`}>
-      <div className="slider-header">
-        <span className="cfg-lbl">{def.label}</span>
-        <span className="slider-val">{cur}</span>
+    <div className={`ios-slider-row${full ? ' full' : ''}`}>
+      <div className="ios-slider-header">
+        <span className="ios-field-label">{def.label}</span>
+        <span className="ios-slider-val">{cur}</span>
       </div>
-      <div className="stepper">
-        <button type="button" className="step-btn" onClick={() => setValue(cur - def.step)}>
+      <div className="ios-slider-controls">
+        <button type="button" className="ios-nav-icon-btn" onClick={() => setValue(cur - def.step)}>
           −
         </button>
         <input
+          className="ios-range"
           type="range"
           min={def.min}
           max={def.max}
@@ -52,7 +53,7 @@ export default function SliderRow({ configKey, full }: Props) {
         <input
           type="text"
           inputMode="decimal"
-          className="step-num"
+          className="ios-input ios-slider-num"
           value={numText}
           onChange={(e) => setNumText(e.target.value)}
           onBlur={commitNumText}
@@ -60,7 +61,7 @@ export default function SliderRow({ configKey, full }: Props) {
             if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
           }}
         />
-        <button type="button" className="step-btn" onClick={() => setValue(cur + def.step)}>
+        <button type="button" className="ios-nav-icon-btn" onClick={() => setValue(cur + def.step)}>
           +
         </button>
       </div>

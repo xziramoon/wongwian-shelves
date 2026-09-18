@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/global.css'
 import './styles/tag.css'
-import './styles/shelves.css'
+import './styles/ios.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useConfigStore } from '../store/configStore';
 import { useUIStore } from '../store/uiStore';
 import { useShelvesStore } from '../store/shelvesStore';
@@ -35,11 +35,6 @@ const PLACEHOLDER_ITEM: QueueItem = {
   Printed: '',
 };
 
-/* global tag-design editor — reachable via the gear-icon pill (top-right, mirrors
- * .conn-status top-left / .queue-badge bottom-right so nothing overlaps). Presets +
- * always-visible basics up top, ~12 SliderRows tucked under a <details> fold so the
- * common case (pick a preset, maybe change the header text) doesn't need scrolling
- * past a wall of sliders. */
 function fmtDaysAgo(ts: number): string {
   const days = Math.floor((Date.now() - ts) / 86400000);
   if (days <= 0) return 'วันนี้';
@@ -59,6 +54,8 @@ export default function SettingsSheet() {
   const removed = useShelvesStore((s) => s.removed);
   const showToast = useUIStore((s) => s.showToast);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   if (!open) return null;
 
@@ -99,156 +96,185 @@ export default function SettingsSheet() {
   };
 
   const removedSorted = [...removed].sort((a, b) => b.removedAt - a.removedAt);
-
   const previewItem = PLACEHOLDER_ITEM;
 
   return (
-    <div className="sheet-backdrop" onClick={() => setOpen(false)}>
-      <div className="sheet sheet-full settings-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="sheet-handle" />
-        <div className="queue-drawer-header">
-          <span>ออกแบบป้ายราคา</span>
-          <button type="button" className="sheet-close" onClick={() => setOpen(false)} aria-label="ปิด">
-            ✕
+    <div className="ios-sheet-backdrop" onClick={() => setOpen(false)}>
+      <div className="ios-sheet" style={{ height: '92vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+        <div className="ios-sheet-handle" />
+        <div className="ios-sheet-header">
+          <span className="ios-sheet-title">ตั้งค่า</span>
+          <button type="button" className="ios-btn plain" onClick={() => setOpen(false)}>
+            เสร็จ
           </button>
         </div>
 
-        <TagPreview item={previewItem} config={config} />
-
-        <div className="preset-row">
-          <button type="button" className="btn btn-preset" onClick={() => applyPreset('S')}>
-            เล็ก
-          </button>
-          <button type="button" className="btn btn-preset" onClick={() => applyPreset('M')}>
-            มาตรฐาน
-          </button>
-          <button type="button" className="btn btn-preset" onClick={() => applyPreset('L')}>
-            ใหญ่
-          </button>
-          <button type="button" className="btn btn-preset" onClick={() => applyPreset('XL')}>
-            ป้ายใหญ่
-          </button>
-        </div>
-
-        <div className="cfg-grid">
-          <div className="cfg-full">
-            <span className="cfg-lbl">ชื่อร้านบนหัวป้าย</span>
-            <input className="inp" value={config.header} onChange={(e) => updateConfig('header', e.target.value)} />
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 20, paddingBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <TagPreview item={previewItem} config={config} />
           </div>
 
-          <div className="cfg-full">
-            <span className="cfg-lbl">ฟอนต์ตัวหนังสือบนป้าย</span>
-            <select className="inp" value={config.font} onChange={(e) => updateConfig('font', e.target.value)}>
-              <option value="'Kanit',sans-serif">Kanit</option>
-              <option value="'Prompt',sans-serif">Prompt</option>
-              <option value="'Sarabun',sans-serif">Sarabun</option>
-              <option value="'Mitr',sans-serif">Mitr</option>
-            </select>
+          <div className="ios-section">
+            <div className="ios-section-header">ขนาดสำเร็จรูป</div>
+            <div className="ios-segmented">
+              <button type="button" className="ios-segmented-option" onClick={() => applyPreset('S')}>
+                เล็ก
+              </button>
+              <button type="button" className="ios-segmented-option" onClick={() => applyPreset('M')}>
+                มาตรฐาน
+              </button>
+              <button type="button" className="ios-segmented-option" onClick={() => applyPreset('L')}>
+                ใหญ่
+              </button>
+              <button type="button" className="ios-segmented-option" onClick={() => applyPreset('XL')}>
+                ป้ายใหญ่
+              </button>
+            </div>
           </div>
 
-          <div>
-            <span className="cfg-lbl">คำนำหน้า "ขนาด"</span>
-            <input className="inp" value={config.labelSize} onChange={(e) => updateConfig('labelSize', e.target.value)} />
+          <div className="ios-section">
+            <div className="ios-section-header">หัวป้าย</div>
+            <div className="ios-list">
+              <div className="ios-row" style={{ cursor: 'default' }}>
+                <div className="ios-row-main">
+                  <span className="ios-field-label">ชื่อร้านบนหัวป้าย</span>
+                  <input className="ios-input" value={config.header} onChange={(e) => updateConfig('header', e.target.value)} />
+                </div>
+              </div>
+              <div className="ios-row" style={{ cursor: 'default' }}>
+                <div className="ios-row-main">
+                  <span className="ios-field-label">ฟอนต์ตัวหนังสือบนป้าย</span>
+                  <select className="ios-input" value={config.font} onChange={(e) => updateConfig('font', e.target.value)}>
+                    <option value="'Kanit',sans-serif">Kanit</option>
+                    <option value="'Prompt',sans-serif">Prompt</option>
+                    <option value="'Sarabun',sans-serif">Sarabun</option>
+                    <option value="'Mitr',sans-serif">Mitr</option>
+                  </select>
+                </div>
+              </div>
+              <div className="ios-row" style={{ cursor: 'default' }}>
+                <div className="ios-row-main">
+                  <span className="ios-field-label">คำนำหน้า "ขนาด" / "บรรจุ"</span>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input className="ios-input" value={config.labelSize} onChange={(e) => updateConfig('labelSize', e.target.value)} />
+                    <input className="ios-input" value={config.labelUnit} onChange={(e) => updateConfig('labelUnit', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+              <div className="ios-row" style={{ cursor: 'default' }}>
+                <div className="ios-row-main">
+                  <span className="ios-field-label">คำว่า "ปลีก" (ป้ายโชว์ 2 ราคา แบบ A)</span>
+                  <input
+                    className="ios-input"
+                    value={config.labelRetail}
+                    onChange={(e) => updateConfig('labelRetail', e.target.value)}
+                    placeholder="เช่น ปลีก, ราคาปกติ, ขายปลีก"
+                  />
+                </div>
+              </div>
+              <div className="ios-row" style={{ cursor: 'default' }}>
+                <div className="ios-row-main">
+                  <div className="ios-row-title">ถมดำพื้นหลังคำว่า "บาท"</div>
+                </div>
+                <label className="ios-toggle">
+                  <input type="checkbox" checked={!!config.invertBaht} onChange={(e) => updateConfig('invertBaht', e.target.checked)} />
+                  <span className="ios-toggle-track" />
+                  <span className="ios-toggle-thumb" />
+                </label>
+              </div>
+            </div>
           </div>
-          <div>
-            <span className="cfg-lbl">คำนำหน้า "บรรจุ"</span>
-            <input className="inp" value={config.labelUnit} onChange={(e) => updateConfig('labelUnit', e.target.value)} />
-          </div>
-          <div className="cfg-full">
-            <span className="cfg-lbl">คำว่า "ปลีก" (ป้ายโชว์ 2 ราคา แบบ A)</span>
-            <input
-              className="inp"
-              value={config.labelRetail}
-              onChange={(e) => updateConfig('labelRetail', e.target.value)}
-              placeholder="เช่น ปลีก, ราคาปกติ, ขายปลีก"
-            />
-          </div>
-        </div>
 
-        <div className="cb-wrap">
-          <input
-            type="checkbox"
-            id="invert-baht"
-            checked={!!config.invertBaht}
-            onChange={(e) => updateConfig('invertBaht', e.target.checked)}
-          />
-          <label htmlFor="invert-baht">ถมดำพื้นหลังคำว่า "บาท"</label>
-        </div>
+          <div className="ios-section">
+            <div className="ios-section-header">ข้อมูลชั้นวาง</div>
+            <div className="ios-list">
+              <button type="button" className="ios-row" onClick={handleExport}>
+                <div className="ios-row-main">
+                  <div className="ios-row-title">สำรองข้อมูล</div>
+                </div>
+                <span className="ios-chevron">›</span>
+              </button>
+              <button type="button" className="ios-row" onClick={handleImportClick}>
+                <div className="ios-row-main">
+                  <div className="ios-row-title">นำเข้าข้อมูล</div>
+                </div>
+                <span className="ios-chevron">›</span>
+              </button>
+              <input ref={fileInputRef} type="file" accept="application/json" hidden onChange={handleImportFile} />
+              <button type="button" className="ios-row" onClick={() => setShowHistory((v) => !v)}>
+                <div className="ios-row-main">
+                  <div className="ios-row-title">ประวัติยิงออก ({removedSorted.length})</div>
+                </div>
+                <span className="ios-chevron">{showHistory ? '⌄' : '›'}</span>
+              </button>
+            </div>
+            {showHistory && (
+              <div className="ios-list" style={{ marginTop: 8 }}>
+                {removedSorted.length === 0 && (
+                  <div className="ios-row" style={{ cursor: 'default' }}>
+                    <div className="ios-row-main ios-row-subtitle">ยังไม่มีประวัติ</div>
+                  </div>
+                )}
+                {removedSorted.slice(0, 200).map((r, i) => (
+                  <div className="ios-row" key={`${r.barcode}-${r.removedAt}-${i}`} style={{ cursor: 'default' }}>
+                    <div className="ios-row-main">
+                      <div className="ios-row-title">{database.find(r.barcode)?.ProductName || `รหัส: ${r.barcode}`}</div>
+                      <div className="ios-row-subtitle">
+                        เดิมอยู่ {r.loc} · {fmtDaysAgo(r.removedAt)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <div className="panel">
-          <div className="p-lbl">ข้อมูลชั้นวาง</div>
-          <div className="sheet-actions">
-            <button type="button" className="btn btn-secondary" onClick={handleExport}>
-              สำรองข้อมูล
+          <div className="ios-section">
+            <button type="button" className="ios-row ios-list" onClick={() => setShowAdvanced((v) => !v)}>
+              <div className="ios-row-main">
+                <div className="ios-row-title">ตั้งค่าขั้นสูง</div>
+              </div>
+              <span className="ios-chevron">{showAdvanced ? '⌄' : '›'}</span>
             </button>
-            <button type="button" className="btn btn-secondary" onClick={handleImportClick}>
-              นำเข้าข้อมูล
-            </button>
+            {showAdvanced && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 12 }}>
+                <div className="ios-card">
+                  <div className="ios-card-title">ตั้งค่าป้ายปกติ</div>
+                  <SliderRow configKey="w" full />
+                  <SliderRow configKey="h" full />
+                  <SliderRow configKey="bcHeight" full />
+                  <div className="ios-section-header" style={{ padding: '6px 0 0' }}>
+                    ขนาดตัวหนังสือ (px)
+                  </div>
+                  <SliderRow configKey="globalNameSz" full />
+                  <SliderRow configKey="priceSz" full />
+                  <SliderRow configKey="dualSz" full />
+                  <SliderRow configKey="metaSz" full />
+                  <div className="ios-section-header" style={{ padding: '6px 0 0' }}>
+                    ริบบิ้นมุมป้าย
+                  </div>
+                  <SliderRow configKey="ribbonSz" full />
+                  <SliderRow configKey="ribbonX" full />
+                  <SliderRow configKey="ribbonY" full />
+                </div>
+
+                <div className="ios-card">
+                  <div className="ios-card-title">ตั้งค่าป้ายใหญ่</div>
+                  <SliderRow configKey="largeW" full />
+                  <SliderRow configKey="largeH" full />
+                  <SliderRow configKey="bcHeightLrg" full />
+                </div>
+
+                <div className="ios-card">
+                  <div className="ios-card-title">ตั้งค่าแถบสินค้าหมด</div>
+                  <SliderRow configKey="oosW" full />
+                  <SliderRow configKey="oosH" full />
+                  <SliderRow configKey="oosSz" full />
+                </div>
+              </div>
+            )}
           </div>
-          <input ref={fileInputRef} type="file" accept="application/json" hidden onChange={handleImportFile} />
         </div>
-
-        <details className="fold">
-          <summary>
-            ประวัติยิงออก ({removedSorted.length})<span className="fold-arrow">▾</span>
-          </summary>
-          <div className="fold-body">
-            {removedSorted.length === 0 && <div className="row-card-meta">ยังไม่มีประวัติ</div>}
-            {removedSorted.slice(0, 200).map((r, i) => (
-              <div className="check-row" key={`${r.barcode}-${r.removedAt}-${i}`}>
-                <span className="check-row-name">
-                  {database.find(r.barcode)?.ProductName || `รหัส: ${r.barcode}`} · เดิมอยู่ {r.loc}
-                </span>
-                <span className="row-item-meta">{fmtDaysAgo(r.removedAt)}</span>
-              </div>
-            ))}
-          </div>
-        </details>
-
-        <details className="fold">
-          <summary>
-            ตั้งค่าขั้นสูง<span className="fold-arrow">▾</span>
-          </summary>
-          <div className="fold-body">
-            <div className="panel">
-              <div className="p-lbl">ตั้งค่าป้ายปกติ</div>
-              <div className="slider-stack">
-                <SliderRow configKey="w" full />
-                <SliderRow configKey="h" full />
-                <SliderRow configKey="bcHeight" full />
-
-                <span className="cfg-lbl cfg-sec-lbl">ขนาดตัวหนังสือ (px)</span>
-                <SliderRow configKey="globalNameSz" full />
-                <SliderRow configKey="priceSz" full />
-                <SliderRow configKey="dualSz" full />
-                <SliderRow configKey="metaSz" full />
-
-                <span className="cfg-lbl cfg-sec-lbl">ริบบิ้นมุมป้าย</span>
-                <SliderRow configKey="ribbonSz" full />
-                <SliderRow configKey="ribbonX" full />
-                <SliderRow configKey="ribbonY" full />
-              </div>
-            </div>
-
-            <div className="panel">
-              <div className="p-lbl">ตั้งค่าป้ายใหญ่</div>
-              <div className="slider-stack">
-                <SliderRow configKey="largeW" full />
-                <SliderRow configKey="largeH" full />
-                <SliderRow configKey="bcHeightLrg" full />
-              </div>
-            </div>
-
-            <div className="panel">
-              <div className="p-lbl">ตั้งค่าแถบสินค้าหมด</div>
-              <div className="slider-stack">
-                <SliderRow configKey="oosW" full />
-                <SliderRow configKey="oosH" full />
-                <SliderRow configKey="oosSz" full />
-              </div>
-            </div>
-          </div>
-        </details>
       </div>
     </div>
   );

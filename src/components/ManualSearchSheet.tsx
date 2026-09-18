@@ -41,18 +41,18 @@ export default function ManualSearchSheet({ onPick }: Props) {
   };
 
   return (
-    <div className="sheet-backdrop" onClick={handleClose}>
-      <div className="sheet manual-search-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="sheet-handle" />
-        <div className="manual-search-fixed">
-          <div className="queue-drawer-header">
-            <span>ค้นหาสินค้า{debouncedQuery.trim() && results.length > 0 ? ` (${results.length})` : ''}</span>
-            <button type="button" className="sheet-close" onClick={handleClose} aria-label="ปิด">
-              ✕
-            </button>
-          </div>
+    <div className="ios-sheet-backdrop" onClick={handleClose}>
+      <div className="ios-sheet" style={{ height: '85vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+        <div className="ios-sheet-handle" />
+        <div className="ios-sheet-header">
+          <span className="ios-sheet-title">ค้นหาสินค้า{debouncedQuery.trim() && results.length > 0 ? ` (${results.length})` : ''}</span>
+          <button type="button" className="ios-btn plain" onClick={handleClose}>
+            ปิด
+          </button>
+        </div>
+        <div className="ios-search">
+          <span>🔍</span>
           <input
-            className="field-input"
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -60,14 +60,21 @@ export default function ManualSearchSheet({ onPick }: Props) {
             autoFocus
           />
         </div>
-        <div className="search-results">
-          {debouncedQuery.trim() && results.length === 0 && <div className="queue-empty">ไม่พบสินค้าที่ค้นหา</div>}
-          {results.map((product) => (
-            <button type="button" key={product.Barcode} className="search-result-row" onClick={() => handlePick(product)}>
-              <div className="queue-row-name">{product.ProductName || 'รหัส: ' + product.Barcode}</div>
-              <div className="queue-row-price">{product.Price || '0.00'} บาท</div>
-            </button>
-          ))}
+        <div style={{ flex: 1, overflowY: 'auto', marginTop: 12 }}>
+          {debouncedQuery.trim() && results.length === 0 && <div className="ios-empty">ไม่พบสินค้าที่ค้นหา</div>}
+          {results.length > 0 && (
+            <div className="ios-list">
+              {results.map((product) => (
+                <button type="button" key={product.Barcode} className="ios-row" onClick={() => handlePick(product)}>
+                  <div className="ios-row-main">
+                    <div className="ios-row-title">{product.ProductName || 'รหัส: ' + product.Barcode}</div>
+                    <div className="ios-row-subtitle">{product.Barcode}</div>
+                  </div>
+                  <span className="ios-row-value">{product.Price || '0.00'} บาท</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

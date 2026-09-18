@@ -16,13 +16,13 @@ function ToastMsg({ toast }: { toast: Toast }) {
     };
   }, [toast.id, removeToast]);
 
-  return <div className={`toast-msg ${toast.type}${show ? ' show' : ''}`}>{toast.msg}</div>;
+  return <div className={`ios-toast ${toast.type}${show ? ' show' : ''}`}>{toast.msg}</div>;
 }
 
 export default function ToastContainer() {
   const toasts = useUIStore((s) => s.toasts);
   return (
-    <div className="toast-container">
+    <div className="ios-toast-container">
       {toasts.map((t) => (
         <ToastMsg key={t.id} toast={t} />
       ))}

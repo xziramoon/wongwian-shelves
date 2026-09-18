@@ -6,6 +6,7 @@ import { buildPrintPlan } from '../lib/printPlan';
 import { buildQueueItemFromShelfItem } from '../lib/buildQueueItem';
 import { formatPrintedDate } from '../lib/utils';
 import { printBridge } from '../lib/printBridge';
+import IosNavBar from './IosNavBar';
 
 const REASON_LABEL = { never: 'ไม่เคยพิมพ์', price: 'ราคาเปลี่ยน', loc: 'ย้ายตำแหน่ง' } as const;
 
@@ -91,90 +92,108 @@ export default function PrintScreen() {
   };
 
   return (
-    <div className="screen">
-      <div className="shelf-screen-header">
-        <button type="button" className="back-btn" onClick={goHome}>
-          ‹ กลับหน้าหลัก
-        </button>
-      </div>
-      <div className="p-lbl">พิมพ์ป้ายราคา</div>
-
-      <div className="mode-btns mode-btns-2">
-        <div className={`mode-btn${onlyChanged ? ' active' : ''}`} onClick={() => setOnlyChanged(true)}>
-          เฉพาะป้ายที่ต้องเปลี่ยน
+    <>
+      <IosNavBar title="พิมพ์ป้ายราคา" onBack={goHome} backLabel="ชั้นวาง" />
+      <div className="ios-body">
+        <div className="ios-segmented">
+          <button type="button" className={`ios-segmented-option${onlyChanged ? ' active' : ''}`} onClick={() => setOnlyChanged(true)}>
+            เฉพาะที่ต้องเปลี่ยน
+          </button>
+          <button type="button" className={`ios-segmented-option${!onlyChanged ? ' active' : ''}`} onClick={() => setOnlyChanged(false)}>
+            ทั้งหมดในที่เลือก
+          </button>
         </div>
-        <div className={`mode-btn${!onlyChanged ? ' active' : ''}`} onClick={() => setOnlyChanged(false)}>
-          ทั้งหมดในที่เลือก
+
+        <div className="ios-section">
+          <div className="ios-list">
+            <div className="ios-row" style={{ cursor: 'default' }}>
+              <div className="ios-row-main">
+                <div className="ios-row-title">แสดงชั้น-แถวบนป้าย</div>
+              </div>
+              <label className="ios-toggle">
+                <input type="checkbox" checked={showLoc} onChange={(e) => setShowLoc(e.target.checked)} />
+                <span className="ios-toggle-track" />
+                <span className="ios-toggle-thumb" />
+              </label>
+            </div>
+            <div className="ios-row" style={{ cursor: 'default' }}>
+              <div className="ios-row-main">
+                <div className="ios-row-title">แสดงวันที่พิมพ์บนป้าย</div>
+              </div>
+              <label className="ios-toggle">
+                <input type="checkbox" checked={showPrinted} onChange={(e) => setShowPrinted(e.target.checked)} />
+                <span className="ios-toggle-track" />
+                <span className="ios-toggle-thumb" />
+              </label>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="cb-wrap">
-        <input type="checkbox" id="show-loc" checked={showLoc} onChange={(e) => setShowLoc(e.target.checked)} />
-        <label htmlFor="show-loc">แสดงชั้น-แถวบนป้าย</label>
-      </div>
-      <div className="cb-wrap">
-        <input type="checkbox" id="show-printed" checked={showPrinted} onChange={(e) => setShowPrinted(e.target.checked)} />
-        <label htmlFor="show-printed">แสดงวันที่พิมพ์บนป้าย</label>
-      </div>
+        <div className="ios-section">
+          <div className="ios-section-header">เลือกชั้น/แถว</div>
+          <div className="ios-list">
+            {shelves.map((shelf) => (
+              <div className="ios-row" key={shelf.id} style={{ cursor: 'default', flexWrap: 'wrap' }}>
+                <label className="ios-toggle" style={{ width: 44, height: 26 }}>
+                  <input type="checkbox" checked={isShelfFullySelected(shelf.id)} onChange={() => toggleShelf(shelf.id)} />
+                  <span className="ios-toggle-track" />
+                  <span className="ios-toggle-thumb" style={{ width: 22, height: 22 }} />
+                </label>
+                <div className="ios-row-main">
+                  <div className="ios-row-title">
+                    ชั้น {shelf.code}
+                    {shelf.name && ` · ${shelf.name}`}
+                  </div>
+                  <div className="ios-tile-pills" style={{ marginTop: 4 }}>
+                    {shelf.rows.map((row) => (
+                      <button
+                        type="button"
+                        key={row.id}
+                        className={`ios-chip${selectedRowIds.has(row.id) ? ' active' : ''}`}
+                        onClick={() => toggleRow(row.id)}
+                      >
+                        แถว {row.no}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <div className="panel">
-        <div className="p-lbl">เลือกชั้น/แถว</div>
-        <div className="print-shelf-pick">
-          {shelves.map((shelf) => (
-            <div key={shelf.id}>
-              <div className="print-shelf-row">
-                <input type="checkbox" checked={isShelfFullySelected(shelf.id)} onChange={() => toggleShelf(shelf.id)} />
-                <strong>ชั้น {shelf.code}</strong>
-                {shelf.name && <span className="row-item-meta">· {shelf.name}</span>}
-              </div>
-              <div className="print-row-pick">
-                {shelf.rows.map((row) => (
-                  <button
-                    type="button"
-                    key={row.id}
-                    className={`chip-btn${selectedRowIds.has(row.id) ? ' active' : ''}`}
-                    onClick={() => toggleRow(row.id)}
-                  >
-                    แถว {row.no}
-                  </button>
-                ))}
-              </div>
+        <div className="ios-card">
+          <div className="ios-card-title">
+            จำนวนรายการ {plan.entries.length} · จำนวนป้ายรวม {totalTags} ใบ
+          </div>
+          {Object.entries(plan.tagCountByShelf).map(([code, count]) => (
+            <div key={code} className="ios-card-line">
+              ชั้น {code}: {count} ใบ
             </div>
           ))}
+          <div className="ios-card-line">
+            {(Object.keys(REASON_LABEL) as (keyof typeof REASON_LABEL)[])
+              .filter((r) => plan.reasonCounts[r] > 0)
+              .map((r) => `${REASON_LABEL[r]} ${plan.reasonCounts[r]}`)
+              .join(' · ')}
+          </div>
+          {plan.pendingBarcodes.length > 0 && (
+            <div className="ios-card-line" style={{ color: 'var(--ios-red)' }}>
+              ⚠ ไม่พบใน Sheet (ไม่ถูกส่งพิมพ์): {plan.pendingBarcodes.join(', ')}
+            </div>
+          )}
         </div>
-      </div>
 
-      <div className="print-summary">
-        <div>
-          จำนวนรายการ: <b>{plan.entries.length}</b> · จำนวนป้ายรวม: <b>{totalTags}</b> ใบ
-        </div>
-        {Object.entries(plan.tagCountByShelf).map(([code, count]) => (
-          <div key={code} className="row-item-meta">
-            ชั้น {code}: {count} ใบ
-          </div>
-        ))}
-        <div className="row-item-meta">
-          {(Object.keys(REASON_LABEL) as (keyof typeof REASON_LABEL)[])
-            .filter((r) => plan.reasonCounts[r] > 0)
-            .map((r) => `${REASON_LABEL[r]} ${plan.reasonCounts[r]}`)
-            .join(' · ')}
-        </div>
-        {plan.pendingBarcodes.length > 0 && (
-          <div className="pending-list">
-            ⚠ ไม่พบใน Sheet (ไม่ถูกส่งพิมพ์): {plan.pendingBarcodes.join(', ')}
-          </div>
+        <button type="button" className="ios-btn filled block" style={{ minHeight: 50 }} onClick={handleSend} disabled={sending || !plan.entries.length}>
+          {sending ? `กำลังส่ง...${progress ? ` (${progress})` : ''}` : `📡 ส่งพิมพ์ (${totalTags} ใบ)`}
+        </button>
+
+        {sendError && !sending && (
+          <button type="button" className="ios-btn tinted block" onClick={handleSend}>
+            ลองอีกครั้ง
+          </button>
         )}
       </div>
-
-      <button type="button" className="btn btn-primary btn-block print-cta" onClick={handleSend} disabled={sending || !plan.entries.length}>
-        {sending ? `กำลังส่ง...${progress ? ` (${progress})` : ''}` : `📡 ส่งพิมพ์ (${totalTags} ใบ)`}
-      </button>
-
-      {sendError && !sending && (
-        <button type="button" className="btn btn-secondary btn-block" onClick={handleSend}>
-          ลองอีกครั้ง
-        </button>
-      )}
-    </div>
+    </>
   );
 }

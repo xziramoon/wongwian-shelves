@@ -45,8 +45,8 @@ export default function RowCamera({ active, onDetect }: Props) {
   if (!active) return null;
 
   return (
-    <div className="row-camera">
-      <video ref={videoRef} className="row-camera-video" muted playsInline />
+    <div className="ios-camera">
+      <video ref={videoRef} muted playsInline />
     </div>
   );
 }
