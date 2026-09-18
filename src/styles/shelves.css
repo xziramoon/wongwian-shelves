@@ -4,12 +4,12 @@
  */
 
 .screen {
-  padding: calc(var(--app-bar-total-h) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
+  padding: calc(var(--app-bar-total-h) + 20px) 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
   max-width: 720px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .form-error {
@@ -39,14 +39,20 @@
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
+  background: linear-gradient(135deg, #efe9ff 0%, #f8f6ff 55%, #ffffff 100%);
+  border: 1px solid rgba(109, 94, 248, 0.14);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
 }
 .home-header-info {
-  font-size: 13.5px;
-  color: var(--txt2);
-  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 700;
 }
 .home-header-time {
   color: var(--txt2);
+  font-weight: 500;
 }
 
 .check-today-card .p-lbl {
@@ -74,18 +80,18 @@
 }
 .shelf-card {
   background: var(--surface);
-  border: 1.5px solid var(--ln2);
+  border: 1px solid var(--ln2);
   box-shadow: var(--shadow-sm);
-  border-radius: 18px;
+  border-radius: 20px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 6px;
   text-align: left;
   cursor: pointer;
   font-family: var(--f-ui);
-  min-height: 104px;
+  min-height: 108px;
   transition: transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 .shelf-card:active {
@@ -93,9 +99,17 @@
   box-shadow: var(--shadow-sm);
 }
 .shelf-card-code {
-  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #efe9ff, #e1d9ff);
+  font-size: 18px;
   font-weight: 800;
-  color: var(--ink);
+  color: var(--ac-d);
 }
 .shelf-card-name {
   font-size: 13px;
@@ -148,9 +162,9 @@
   align-items: center;
   gap: 12px;
   background: var(--surface);
-  border: 1.5px solid var(--ln2);
+  border: 1px solid var(--ln2);
   box-shadow: var(--shadow-sm);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 14px;
   cursor: pointer;
   text-align: left;
@@ -307,9 +321,9 @@
   align-items: center;
   gap: 10px;
   background: var(--surface);
-  border: 1.5px solid var(--ln2);
+  border: 1px solid var(--ln2);
   box-shadow: var(--shadow-sm);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 10px 12px;
 }
 .row-item-thumb {
@@ -436,9 +450,9 @@
 /* ---- print screen ---- */
 .print-summary {
   background: var(--surface);
-  border: 1.5px solid var(--ln2);
+  border: 1px solid var(--ln2);
   box-shadow: var(--shadow-sm);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
   color: var(--ink);
   font-size: 13.5px;
