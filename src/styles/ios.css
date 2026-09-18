@@ -56,6 +56,16 @@
   }
 }
 
+/* global.css (lifted from wongwian-tags-mobile) locks #root to a fixed 100dvh with
+ * overflow:hidden — that app is a full-screen-camera layout where every scrollable
+ * area is its own internal overflow-y:auto container. This app's screens are normal
+ * scrolling pages instead, so undo that lock here rather than editing the shared file. */
+#root {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
 .ios-app {
   font-family: var(--ios-font);
   background: var(--ios-bg);
